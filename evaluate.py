@@ -5,7 +5,7 @@ import time
 import argparse
 
 parser = argparse.ArgumentParser(description='evaluate')
-parser.add_argument('--mat-path',default='ft_ResNet50_4', type=str, help='0,1,2,3...or last')
+parser.add_argument('--mat-path',default='ft_ResNet50_6', type=str, help='0,1,2,3...or last')
 opt = parser.parse_args()
 mat_path = opt.mat_path
 
