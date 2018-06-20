@@ -10,7 +10,8 @@ from torch.optim import lr_scheduler
 from torch.autograd import Variable
 import numpy as np
 import torchvision
-from torchvision import datasets, models, transforms
+# from torchvision import datasets, models, transforms
+from torchvision import datasets, models
 import matplotlib
 matplotlib.use('agg')
 import matplotlib.pyplot as plt
@@ -24,6 +25,8 @@ import shutil
 import shuttle
 from sampler import MySampler
 from triplet import TripletLoss
+from torchvision import transforms as T
+from my_transforms import RandomSizedRectCrop
 # from optimizer import train_model
 
 ######################################################################
@@ -31,7 +34,7 @@ from triplet import TripletLoss
 # --------
 parser = argparse.ArgumentParser(description='Training')
 parser.add_argument('--gpu_ids',default='0', type=str,help='gpu_ids: e.g. 0  0,1,2  0,2')
-parser.add_argument('--name',default='ft_ResNet50_6', type=str, help='output model name')
+parser.add_argument('--name',default='ft_ResNet50_hw', type=str, help='output model name')
 # parser.add_argument('--data_dir',default='/home/wang/datasets/reid/Market-1501-v15.09.15/pytorch',type=str, help='training dir path')
 parser.add_argument('--data_dir',default='/public/users/wanggc/datasets/reid/Market-1501-v15.09.15/pytorch',type=str, help='training dir path')
 parser.add_argument('--train_all', action='store_true', help='use all training data' )
@@ -61,24 +64,29 @@ for str_id in str_ids:
 # Load Data
 transform_train_list = [
         #transforms.RandomResizedCrop(size=128, scale=(0.75,1.0), ratio=(0.75,1.3333), interpolation=3), #Image.BICUBIC)
-        transforms.Resize(144, interpolation=3),
-        transforms.RandomCrop((256,128)),
-        transforms.RandomHorizontalFlip(),
-        transforms.ToTensor(),
-        transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
+        # T.Resize(144, interpolation=3),
+        # T.RandomCrop((256,128)),
+        # T.RandomSizedRectCrop(256, 128),
+        T.RandomHorizontalFlip(),
+        T.ToTensor(),
+        T.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
         ]
 
+transform_train_list = [RandomSizedRectCrop(256,128)]+transform_train_list
+# if opt.erasing_p>0:
+# opt.erasing_p=0.5
 if opt.erasing_p>0:
     transform_train_list = transform_train_list + [RandomErasing(opt.erasing_p)]
     
+# if opt.color_jitter:
 if opt.color_jitter:
-    transform_train_list = [transforms.ColorJitter(brightness=0.1, contrast=0.1, saturation=0.1, hue=0)] + transform_train_list
+    transform_train_list = [T.ColorJitter(brightness=0.1, contrast=0.1, saturation=0.1, hue=0)] + transform_train_list
 
 print(transform_train_list)
 
 
 
-data_transforms = transforms.Compose( transform_train_list)
+data_transforms = T.Compose( transform_train_list)
 
 
 # train_all = ''
@@ -156,6 +164,7 @@ def train_model(model, criterion, optimizer, num_epochs):
         for data in dataloaders:
             # get the inputs
             inputs, labels = data
+            # print('inputs:',inputs)
             # inputs = data
             # labels = targets
             # labels = torch.FloatTensor(labels)

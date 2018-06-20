@@ -24,7 +24,7 @@ parser.add_argument('--gpu_ids',default='0', type=str,help='gpu_ids: e.g. 0  0,1
 # parser.add_argument('--which_epoch',default='last', type=str, help='0,1,2,3...or last')
 parser.add_argument('--which_epoch',default='149', type=str, help='0,1,2,3...or last')
 parser.add_argument('--test_dir',default='/public/users/wanggc/datasets/reid/Market-1501-v15.09.15/pytorch',type=str, help='./test_data')
-parser.add_argument('--name', default='ft_ResNet50_6', type=str, help='save model path')
+parser.add_argument('--name', default='ft_ResNet50_hw', type=str, help='save model path')
 parser.add_argument('--batchsize', default=32, type=int, help='batchsize')
 parser.add_argument('--use_dense', action='store_true', help='use densenet121' )
 
